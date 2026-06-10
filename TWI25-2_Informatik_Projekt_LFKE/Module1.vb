@@ -64,7 +64,9 @@
     Const ITEM_TYP_ULTIMATE = 2
     Const ITEM_TYP_SCHUSS = 3
 
+
     ' Wie viele Schuss eine eingesammelte Schuss-Box gibt
+
     Const SCHUSS_PRO_ITEM = 3
 
 
@@ -78,21 +80,37 @@
 
     '  KONSTANTEN – Boost-Feld
 
+
     ' Boost-Feld ist 2 Zeichen breit (">>")
+
     Const BOOST_ZEICHEN As Char = ">"c
+
+
     ' Chance, dass in einer Zeile ein Boost-Feld erscheint (kleiner = haeufiger)
+
     Const BOOST_CHANCE = 20
+
+
     ' Wie lange der Boost wirkt (in Sekunden)
+
     Const BOOST_DAUER_SEKUNDEN = 2
+
+
     ' Faktor, um den das Spiel waehrend des Boosts schneller laeuft
+
     Const BOOST_FAKTOR = 2
 
 
     '  KONSTANTEN – Streckenmarkierungen
 
+
     ' Startlinie (schwarz-weiss kariert) quer ueber die Strasse
+
     Const STARTLINIE_ZEICHEN As Char = "="c
+
+
     ' Meilenstein-Linie alle 100 m
+
     Const MEILENSTEIN_ZEICHEN As Char = "-"c
     Const MEILENSTEIN_INTERVALL = 100
 
@@ -111,14 +129,25 @@
 
     '  KONSTANTEN – Ultimates
 
+
     ' Buggy: Dauer der Unverwundbarkeit (in Ticks)
+
     Const ULT_BUGGY_TICKS = 25
+
+
     ' Standard (Vollbremsung): Dauer von Zeitlupe + Unverwundbarkeit (in Ticks)
+
     Const ULT_VOLLBREMSUNG_TICKS = 40
+
+
     ' Faktor, um den das Spiel waehrend der Zeitlupe langsamer laeuft
+
     Const ULT_SLOWMO_FAKTOR = 2
+
+
     ' Gold (Goldraeumung): so viele Meter lang spawnen keine neuen Hindernisse
     ' (ca. 3 Sekunden im Spiel)
+
     Const GOLD_RAEUMUNG_METER = 15
 
 
@@ -639,8 +668,10 @@
             End Select
         ElseIf nurStrasse Then
 
+
             ' Nur Strasse mit Leitplanken – keine Hindernisse, keine Items.
             ' (Leitplanken sind oben bereits gesetzt)
+
         Else
             Randomize()
             Dim fahrbahnBreite As Integer = leitRechts - leitLinks - 1
@@ -674,7 +705,9 @@
                 End If
             End If
 
+
             ' Boost-Feld (2 Zeichen breit) zufaellig auf freie Strasse setzen
+
             Dim fahrbahnBoost As Integer = leitRechts - leitLinks - 1
             If fahrbahnBoost > 2 Then
                 If CInt(VBMath.Rnd() * BOOST_CHANCE) = 0 Then
@@ -724,7 +757,10 @@
                         Console.Write(zelle)
                         Strecke_Farben_Setzen(strecke)
                     Case STARTLINIE_ZEICHEN
+
+
                         ' Schwarz-weiss kariert (je nach Spalte abwechselnd)
+
                         If s Mod 2 = 0 Then
                             Console.BackgroundColor = ConsoleColor.White
                             Console.ForegroundColor = ConsoleColor.White
@@ -784,10 +820,14 @@
         Console.ForegroundColor = ConsoleColor.Gray
         Zentriert_Schreiben("Steuerung: Pfeiltasten | Ultimate: Leertaste", 15)
 
+
         ' Auf eine beliebige Taste warten
+
         Console.ReadKey(True)
 
+
         ' Spielmusik wieder starten und Spielfeld neu aufbauen
+
         Musik_Starten("Spielsound.wav")
         Strecke_Farben_Setzen(strecke)
         Console.Clear()
@@ -808,19 +848,31 @@
                                   ByRef spielfeld(,) As Char) As Integer
         Select Case fahrzeug
             Case 1
+
+
                 ' Standard – Vollbremsung: Zeitlupe + Unverwundbarkeit
+
                 slowmoTicks = ULT_VOLLBREMSUNG_TICKS
                 Return ULT_VOLLBREMSUNG_TICKS
             Case 2
+
+
                 ' Buggy – 5 Sek. unverwundbar
+
                 Return ULT_BUGGY_TICKS
             Case 3
+
+
                 ' Klein – Doppelsprung 2 Felder nach links
+
                 spielfigur_spalte = Math.Max(0, spielfigur_spalte - 2)
                 Return 0
             Case 4
+
+
                 ' Gold – Goldraeumung: alle Hindernisse auf dem Bildschirm
                 ' loeschen und fuer eine kurze Schonzeit keine neuen spawnen
+
                 Dim z, s As Integer
                 For z = 0 To ZEILE_MAX
                     For s = 0 To SPALTE_MAX
@@ -852,8 +904,10 @@
         Dim trefferZeile As Integer = -1
         Dim trefferSpalte As Integer = -1
 
+
         ' Naechstes Hindernis oberhalb des Fahrzeugs suchen
         ' (von knapp ueber dem Auto nach oben)
+
         For z = ZEILE_MAX - 3 To 0 Step -1
             For s = spielfigur_spalte To spielfigur_spalte + fahrzeugBreite - 1
                 If s >= 0 And s <= SPALTE_MAX Then
@@ -867,10 +921,14 @@
             If trefferZeile >= 0 Then Exit For
         Next
 
+
         ' Schuss-Spalte = Mitte des Fahrzeugs
+
         Dim schussSpalte As Integer = spielfigur_spalte + (fahrzeugBreite \ 2)
 
+
         ' Strahl zeichnen (vom Fahrzeug bis zum Treffer bzw. nach ganz oben)
+
         Dim bisZeile As Integer = If(trefferZeile >= 0, trefferZeile, 0)
         Console.ForegroundColor = ConsoleColor.Red
         For z = ZEILE_MAX - 3 To bisZeile Step -1
@@ -882,7 +940,9 @@
         Strecke_Farben_Setzen(strecke)
         Threading.Thread.Sleep(80)
 
+
         ' Getroffenes Hindernis zerstoeren (Hindernisse sind 2 Zeichen breit)
+
         If trefferZeile >= 0 Then
             Dim hindLinks As Integer = trefferSpalte
             If hindLinks > 0 AndAlso spielfeld(trefferZeile, hindLinks - 1) = HINDERNIS_ZEICHEN Then
@@ -895,7 +955,9 @@
             g_statHindernisZerstoert += 1
         End If
 
+
         ' Spielfeld neu aufbauen, damit der Strahl wieder verschwindet
+
         Strecke_Farben_Setzen(strecke)
         Spielfeld_Rendern(spielfeld, curbPhase, strecke)
     End Sub
@@ -923,7 +985,9 @@
 
         Zentriert_Schreiben("===  S T A T I S T I K  ===", 2)
 
+
         ' Durchschnitt pro Spiel berechnen (Division durch 0 vermeiden)
+
         Dim schnitt As Integer = 0
         If g_statSpiele > 0 Then
             schnitt = g_statGesamtMeter \ g_statSpiele
@@ -980,7 +1044,9 @@
         End Select
     End Function
 
+
     ' Schaltet einen Erfolg frei, wenn die Bedingung erstmals erfuellt ist.
+
     Sub Pruefe_Achievement(ByVal id As Integer, ByVal bedingung As Boolean)
         If bedingung And Not g_achFreigeschaltet(id) Then
             g_achFreigeschaltet(id) = True
@@ -989,8 +1055,10 @@
         End If
     End Sub
 
+
     ' Prueft alle Erfolge. g_neuAchievements enthaelt danach die
     ' Namen der in dieser Runde neu freigeschalteten Erfolge.
+
     Sub Achievements_Pruefen()
         g_neuAchievements = ""
         Pruefe_Achievement(0, g_statSpiele >= 1)
@@ -1011,7 +1079,9 @@
 
         Zentriert_Schreiben("===  A C H I E V E M E N T S  ===", 1)
 
+
         ' Anzahl freigeschalteter Erfolge zaehlen
+
         Dim anzahl As Integer = 0
         For k As Integer = 0 To ACH_ANZAHL - 1
             If g_achFreigeschaltet(k) Then anzahl += 1
@@ -1104,7 +1174,9 @@
         Musik_Stoppen()
         Sound_GameOver()
 
+
         ' Statistik aktualisieren
+
         g_statSpiele += 1
         g_statGesamtMeter += meter
         If meter > g_statBesteMeter Then g_statBesteMeter = meter
@@ -1141,7 +1213,9 @@
             Zentriert_Schreiben("★  GOLDENES FAHRZEUG FREIGESCHALTET!  ★", 20)
         End If
 
+
         ' Neue Achievements pruefen und ggf. anzeigen
+
         Achievements_Pruefen()
         If g_neuAchievements <> "" Then
             Console.ForegroundColor = ConsoleColor.Green
@@ -1239,8 +1313,10 @@
             Next
         Next
 
+
         ' Startlinie quer ueber die Strasse setzen (knapp ueber den
         ' Startplaetzen). Sie scrollt beim Losfahren nach unten weg.
+
         Dim startlinieZeile As Integer = ZEILE_MAX - 8
         For s = leitLinksStart + 1 To leitRechtsStart - 1
             spielfeld(startlinieZeile, s) = STARTLINIE_ZEICHEN
@@ -1273,9 +1349,11 @@
 
             curbPhase += 1
 
+
             ' Waehrend der Goldraeumungs-Schonzeit keine neuen Hindernisse:
             ' dazu eine sehr hohe Chance einsetzen (praktisch nie ein Treffer).
             ' Items spawnen weiterhin normal.
+
             Dim effektiveChance As Integer = hindernisChance
             If keinHindernisMeter > 0 Then
                 effektiveChance = 1000000
@@ -1297,8 +1375,10 @@
             If g_itemMeldungTicks > 0 Then g_itemMeldungTicks -= 1
             If g_itemMeldungTicks = 0 Then g_itemMeldung = ""
 
+
             ' Alle 100 m: Meilenstein-Linie quer ueber die Strasse in die
             ' oberste Zeile setzen und kurz einen Banner anzeigen.
+
             If meter Mod MEILENSTEIN_INTERVALL = 0 Then
                 Dim mlLinks As Integer = -1
                 Dim mlRechts As Integer = -1
@@ -1317,10 +1397,14 @@
                 meilensteinTicks = 12
             End If
 
+
             ' Spielfeld zeichnen (eigene Sub)
+
             Spielfeld_Rendern(spielfeld, curbPhase, g_strecke)
 
+
             ' Meilenstein-Banner ueber dem Spielfeld anzeigen
+
             If meilensteinTicks > 0 Then
                 Console.BackgroundColor = ConsoleColor.Black
                 Console.ForegroundColor = ConsoleColor.Yellow
@@ -1351,10 +1435,16 @@
                             ultimateVerfuegbar = False
                         End If
                     ElseIf cki.Key = ConsoleKey.P Then
+
+
                         ' Spiel pausieren
+
                         Pause_Anzeigen(spielfeld, curbPhase, g_strecke)
                     ElseIf cki.Key = ConsoleKey.UpArrow Then
+
+
                         ' Schiessen, falls Munition vorhanden
+
                         If schussMunition > 0 Then
                             Schuss_Abfeuern(spielfigur_spalte, fahrzeugBreite,
                                             curbPhase, g_strecke, spielfeld)
@@ -1415,7 +1505,9 @@
                             Randomize()
                             Dim powerUp As Integer = CInt(Math.Floor(VBMath.Rnd() * 4))
 
+
                             ' Statistik: ein Item eingesammelt
+
                             g_statItems += 1
 
                             Select Case powerUp
@@ -1453,19 +1545,28 @@
                             If Not ultimateAktiv And Not schildAktiv And hindernisSchutz = 0 Then
                                 leben -= 1
                                 hindernisSchutz = BEWEGUNG_SPIELFIGUR
+
+
                                 ' Statistik: ein Hindernis getroffen
+
                                 g_statHindernisse += 1
                             End If
                             spielfeld(KOLLISIONS_ZEILE, s) = " "c
                         End If
 
                         If kollisionsZelle = BOOST_ZEICHEN Then
+
+
                             ' Boost-Feld ueberfahren -> fuer 2 Sekunden schneller
+
                             boostEnde = DateTime.Now.AddSeconds(BOOST_DAUER_SEKUNDEN)
                             g_itemMeldung = "BOOST!"
                             g_itemMeldungTicks = 15
+
+
                             ' Das ganze Boost-Feld aus dem Spielfeld entfernen.
                             ' Erst die linke Kante suchen, dann alle ">" loeschen.
+
                             Dim boostLinks As Integer = s
                             Do While boostLinks > 0 AndAlso
                                      spielfeld(KOLLISIONS_ZEILE, boostLinks - 1) = BOOST_ZEICHEN
@@ -1517,8 +1618,10 @@
 
                 Strecke_Farben_Setzen(g_strecke)
 
+
                 ' Wartezeit pro Schritt – waehrend der Zeitlupe (Vollbremsung)
                 ' laeuft das Spiel langsamer, waehrend eines Boosts schneller.
+
                 Dim aktSleep As Integer = CInt(wartezeit / BEWEGUNG_SPIELFIGUR)
                 If slowmoTicks > 0 Then
                     aktSleep = aktSleep * ULT_SLOWMO_FAKTOR
@@ -1635,6 +1738,7 @@
         Musik_Stoppen()
     End Sub
 
+
     '  OPTIONEN-MENUE
     '  Laeuft in einer Schleife, damit mehrere Einstellungen
     '  nacheinander geaendert werden koennen.
@@ -1665,23 +1769,35 @@
 
             Select Case eingabe
                 Case "1"
+
+
                     ' Musik an/aus schalten
+
                     g_musikAn = Not g_musikAn
                     If g_musikAn Then
+
+
                         ' Wieder eingeschaltet -> Menuemusik sofort starten
+
                         Musik_Starten("Startbildschirm.wav")
                     Else
                         Musik_Stoppen()
                     End If
                 Case "2"
+
+
                     ' Startleben durchschalten 3 -> 5 -> 7 -> 3
+
                     Select Case g_startLeben
                         Case 3 : g_startLeben = 5
                         Case 5 : g_startLeben = 7
                         Case Else : g_startLeben = 3
                     End Select
                 Case "3"
+
+
                     ' Statistik zuruecksetzen (mit Sicherheitsabfrage)
+
                     Console.SetCursorPosition(20, 13)
                     Console.ForegroundColor = ConsoleColor.Red
                     Console.Write("  Wirklich zuruecksetzen? (j/n): ")
@@ -1744,6 +1860,7 @@
         Console.CursorVisible = True : Console.ReadLine() : Console.CursorVisible = False
     End Sub
 
+
     '  INTRO-ANIMATION
     '  Wird beim Programmstart gezeigt. Karierte Flaggen wandern,
     '  der Titel pulsiert und ein Kart faehrt ueber den Bildschirm.
@@ -1754,10 +1871,14 @@
         Console.BackgroundColor = ConsoleColor.Black
         Console.Clear()
 
+
         ' Spielmusik fuer das Intro starten (falls Musik aktiviert)
+
         Musik_Starten("Startbildschirm.wav")
 
+
         ' Kart (3 Zeilen, 6 Zeichen breit) – Ansicht von oben
+
         Dim kart0 As String = " /==\ "
         Dim kart1 As String = "[|oo|]"
         Dim kart2 As String = " \==/ "
@@ -1771,8 +1892,10 @@
         Dim frame As Integer = 0
 
         Do
+
             ' Karierte Flaggen oben (Zeile 0) und unten (Zeile ZEILE_MAX),
             ' das Muster wandert pro Frame -> wirkt wie wehende Flagge.
+
             Console.SetCursorPosition(0, 0)
             For sc As Integer = 0 To SPALTE_MAX - 1
                 Console.BackgroundColor = If((sc + frame) Mod 2 = 0,
@@ -1787,7 +1910,9 @@
             Next
             Console.BackgroundColor = ConsoleColor.Black
 
+
             ' Titel – "MARIO KART" pulsiert zwischen Rot und Gelb
+
             Console.ForegroundColor = ConsoleColor.Cyan
             Zentriert_Schreiben("S P A C E   I N V A D E R S", 5)
             Console.ForegroundColor = ConsoleColor.White
@@ -1796,19 +1921,25 @@
                                          ConsoleColor.Red, ConsoleColor.Yellow)
             Zentriert_Schreiben("M A R I O   K A R T", 7)
 
+
             ' Kart an alter Position loeschen
+
             Dim leer As String = New String(" "c, kartBreite)
             Console.SetCursorPosition(prevSpalte, kartZeile) : Console.Write(leer)
             Console.SetCursorPosition(prevSpalte, kartZeile + 1) : Console.Write(leer)
             Console.SetCursorPosition(prevSpalte, kartZeile + 2) : Console.Write(leer)
 
+
             ' Kart an neuer Position zeichnen
+
             Console.ForegroundColor = ConsoleColor.Red
             Console.SetCursorPosition(kartSpalte, kartZeile) : Console.Write(kart0)
             Console.SetCursorPosition(kartSpalte, kartZeile + 1) : Console.Write(kart1)
             Console.SetCursorPosition(kartSpalte, kartZeile + 2) : Console.Write(kart2)
 
+
             ' Blinkender Hinweis
+
             If (frame \ 4) Mod 2 = 0 Then
                 Console.ForegroundColor = ConsoleColor.White
                 Zentriert_Schreiben(hinweis, 20)
@@ -1816,13 +1947,17 @@
                 Zentriert_Schreiben(New String(" "c, hinweis.Length), 20)
             End If
 
+
             ' Beliebige Taste gedrueckt? -> Intro beenden
+
             If Console.KeyAvailable Then
                 Console.ReadKey(True)
                 Exit Do
             End If
 
+
             ' Kart weiterbewegen (am rechten Rand wieder von links)
+
             prevSpalte = kartSpalte
             kartSpalte += 2
             If kartSpalte > SPALTE_MAX - kartBreite Then kartSpalte = 0
