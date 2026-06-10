@@ -1,7 +1,8 @@
 ﻿Module Module1
 
+#Region "KonstantenUndGlobals"
 
-    '  KONSTANTEN – Tastatur
+    ' Konstanten: Tastatur
 
     Const NO_KEY = 0
     Const CURSOR_LEFT = 1
@@ -9,7 +10,7 @@
     Const UNKNOWN_KEY = 99
 
 
-    '  KONSTANTEN – Spielfeld
+    ' Konstanten: Spielfeld
 
     Const SPALTE_MAX = 79
     Const ZEILE_MAX = 24
@@ -17,7 +18,7 @@
     Const KOLLISIONS_ZEILE = ZEILE_MAX - 2
 
 
-    '  KONSTANTEN – Leitplanken
+    ' Leitplanken / Strassenbreite
 
     Const LEITPLANKE_ZEICHEN As Char = "|"c
 
@@ -27,7 +28,7 @@
     Const STRASSE_MITTE_STANDARD As Double = SPALTE_MAX / 2
 
 
-    '  KONSTANTEN – Streckengenerator
+    ' --- Streckengenerator ---
 
     Const SEG_LAENGE_MIN = 10
     Const SEG_LAENGE_MAX = 30
@@ -45,14 +46,14 @@
     Const GLAETTUNG As Double = 0.09
 
 
-    '  KONSTANTEN – CCM
+    ' CCM (Geschwindigkeit)
 
     Const CCM_50_WARTEZEIT = 300
     Const CCM_100_WARTEZEIT = 200
     Const CCM_150_WARTEZEIT = 120
 
 
-    '  KONSTANTEN – Items
+    ' Items auf der Strecke
 
     Const ITEM_LINKS As Char = "["c
     Const ITEM_MITTE As Char = "?"c
@@ -70,7 +71,7 @@
     Const SCHUSS_PRO_ITEM = 3
 
 
-    '  KONSTANTEN – Hindernisse
+    ' Hindernisse + Schwierigkeit
 
     Const HINDERNIS_ZEICHEN As Char = "█"c
     Const HINDERNIS_CHANCE_START = 6
@@ -78,15 +79,12 @@
     Const SCHWIERIGKEIT_INTERVALL = 100
 
 
-    '  KONSTANTEN – Boost-Feld
-
-
-    ' Boost-Feld ist 2 Zeichen breit (">>")
+    ' Boost-Feld (2 Zeichen: ">>")
 
     Const BOOST_ZEICHEN As Char = ">"c
 
 
-    ' Chance, dass in einer Zeile ein Boost-Feld erscheint (kleiner = haeufiger)
+    ' Chance, dass in einer Zeile ein Boost-Feld erscheint (kleiner = häufiger)
 
     Const BOOST_CHANCE = 20
 
@@ -101,10 +99,8 @@
     Const BOOST_FAKTOR = 2
 
 
-    '  KONSTANTEN – Streckenmarkierungen
-
-
-    ' Startlinie (schwarz-weiss kariert) quer ueber die Strasse
+    ' Streckenmarkierungen (Startlinie, Meilenstein)
+    ' Startlinie = schwarz-weiss kariert
 
     Const STARTLINIE_ZEICHEN As Char = "="c
 
@@ -115,22 +111,17 @@
     Const MEILENSTEIN_INTERVALL = 100
 
 
-    '  KONSTANTEN – Strecken
+    ' Streckentypen
 
     Const STRECKE_EIS = 1
     Const STRECKE_WUESTE = 2
     Const STRECKE_AUTOBAHN = 3
 
-
-    '  KONSTANTEN – Freischalt-Schwelle
-
+    ' Ab dieser Meterzahl wird Gold-Fahrzeug freigeschaltet
     Const GOLD_UNLOCK_METER = 400
 
-
-    '  KONSTANTEN – Ultimates
-
-
-    ' Buggy: Dauer der Unverwundbarkeit (in Ticks)
+    ' Ultimates (Ticks, Slowmo, Goldräumung)
+    ' Buggy = Unverwundbarkeit in Ticks
 
     Const ULT_BUGGY_TICKS = 25
 
@@ -140,23 +131,20 @@
     Const ULT_VOLLBREMSUNG_TICKS = 40
 
 
-    ' Faktor, um den das Spiel waehrend der Zeitlupe langsamer laeuft
+    ' Faktor, um den das Spiel während der Zeitlupe langsamer läuuft
 
     Const ULT_SLOWMO_FAKTOR = 2
 
 
-    ' Gold (Goldraeumung): so viele Meter lang spawnen keine neuen Hindernisse
+    ' Gold (Goldräumung): so viele Meter lang spawnen keine neuen Hindernisse
     ' (ca. 3 Sekunden im Spiel)
 
     Const GOLD_RAEUMUNG_METER = 15
 
 
-    '  KONSTANTEN – Achievements
-
     Const ACH_ANZAHL = 7
 
-
-    '  GLOBALE SPIELVARIABLEN
+    ' Globale Spielvariablen
 
     Dim g_ccm As Integer = 100
     Dim g_strecke As Integer = STRECKE_AUTOBAHN
@@ -168,13 +156,13 @@
     Dim g_musikPlayer As New System.Media.SoundPlayer()
 
 
-    '  GLOBALE VARIABLEN – Optionen
+    ' Optionen
 
     Dim g_musikAn As Boolean = True
     Dim g_startLeben As Integer = 5
 
 
-    '  GLOBALE VARIABLEN – Statistik
+    ' Statistik (wird nach jeder Runde aktualisiert)
 
     Dim g_statSpiele As Integer = 0
     Dim g_statGesamtMeter As Integer = 0
@@ -185,13 +173,11 @@
     Dim g_streckeGefahren(3) As Boolean
 
 
-    '  GLOBALE VARIABLEN – Achievements
-
     Dim g_achFreigeschaltet(ACH_ANZAHL - 1) As Boolean
     Dim g_neuAchievements As String = ""
 
 
-    '  HIGHSCORE
+    ' Highscore-Tabelle (max. 5 Einträge)
 
     Structure HighscoreEintrag
         Dim name As String
@@ -200,11 +186,14 @@
     Dim g_highscores(4) As HighscoreEintrag
     Dim g_highscoreAnzahl As Integer = 0
 
+#End Region
 
-    '  TASTATUR
+#Region "AudioUndHilfen"
+
+    ' Tastatur
 
     Function Tastatur_Abfrage() As Integer
-        If Console.KeyAvailable = False Then Return NO_KEY
+        If Not Console.KeyAvailable Then Return NO_KEY
         Dim cki As ConsoleKeyInfo = Console.ReadKey(True)
         If cki.Key = ConsoleKey.LeftArrow Then Return CURSOR_LEFT
         If cki.Key = ConsoleKey.RightArrow Then Return CURSOR_RIGHT
@@ -212,8 +201,8 @@
     End Function
 
 
-    '  MUSIK
-    '  Startet nur wenn Musik in den Optionen eingeschaltet ist.
+    ' --- Musik ---
+    ' Startet nur wenn Musik in den Optionen eingeschaltet ist.
 
     Sub Musik_Starten(ByVal dateiname As String)
         If Not g_musikAn Then
@@ -237,6 +226,7 @@
 
     Sub Sound_Abspielen(ByVal dateiname As String)
         If Not g_musikAn Then Return
+        ' Kurzer Sound in eigenem Thread
         Dim t As New Threading.Thread(Sub()
                                           Try
                                               Dim player As New System.Media.SoundPlayer(dateiname)
@@ -257,7 +247,7 @@
     End Sub
 
 
-    '  HILFSFUNKTION – Text zentriert ausgeben
+    ' Text zentriert auf dem Bildschirm
 
     Sub Zentriert_Schreiben(ByVal text As String, ByVal zeile As Integer)
         Dim spalte As Integer = (SPALTE_MAX \ 2) - (text.Length \ 2)
@@ -267,7 +257,7 @@
     End Sub
 
 
-    '  STARTAUFSTELLUNG MIT AMPEL
+    ' Startaufstellung + Ampel vor dem Rennen
 
     Function Startaufstellung_Anzeigen() As Integer
         Randomize()
@@ -400,8 +390,11 @@
         Return spielerPlatz
     End Function
 
+#End Region
 
-    '  STRECKEN-HILFSFUNKTIONEN
+#Region "StreckeUndFahrzeug"
+
+    ' Strecken-Hilfsfunktionen
 
     Function Strecke_Name(ByVal id As Integer) As String
         Select Case id
@@ -411,6 +404,8 @@
             Case Else : Return "Unbekannt "
         End Select
     End Function
+
+    ' Konsolenfarben je Strecke
 
     Sub Strecke_Farben_Setzen(ByVal id As Integer)
         Select Case id
@@ -425,6 +420,8 @@
                 Console.ForegroundColor = ConsoleColor.White
         End Select
     End Sub
+
+    ' Leitplanken: wechselnd weiss/rot
 
     Sub Curb_Farbe_Setzen(ByVal curbPhase As Integer)
         If curbPhase Mod 2 = 0 Then
@@ -470,7 +467,7 @@
     End Sub
 
 
-    '  FAHRZEUG – 2x2 ASCII ART
+    ' Fahrzeug (2x2 ASCII)
 
     Function Fahrzeug_Zeile1(ByVal id As Integer) As String
         Select Case id
@@ -532,7 +529,7 @@
                           ByVal schildAktiv As Boolean,
                           ByVal strecke As Integer)
         Dim farbe As ConsoleColor = Fahrzeug_Farbe(id)
-        If ultimateAktiv Then farbe = ConsoleColor.Yellow
+        If ultimateAktiv Then farbe = ConsoleColor.Yellow   ' Ultimate = gelb
         If schildAktiv Then farbe = ConsoleColor.Cyan
 
         Console.SetCursorPosition(spalte, ZEILE_MAX - 2)
@@ -556,8 +553,6 @@
     End Sub
 
 
-    '  STARTPOSITION BERECHNEN
-
     Function Startposition_Berechnen(ByVal spielerPlatz As Integer,
                                      ByVal leitLinks As Integer,
                                      ByVal leitRechts As Integer) As Integer
@@ -571,8 +566,11 @@
         End Select
     End Function
 
+#End Region
 
-    '  STRECKENGENERATOR
+#Region "Streckengenerator"
+
+    ' Nächstes Streckensegment würfeln
 
     Sub Segment_Neu_Wuerfeln(ByRef zielBreite As Double,
                               ByRef zielMitte As Double,
@@ -613,9 +611,8 @@
     End Sub
 
 
-    '  ZEILE ERZEUGEN
-    '  nurStrasse = True  ->  nur Leitplanken, KEINE Hindernisse
-    '                          und KEINE Items (fuer Spielstart)
+    ' Erzeugt eine Zeile der Strecke
+    ' nurStraße=True -> keine Hindernisse/Items (Spielstart)
 
     Sub Erzeuge_Zeile(ByRef Zeile() As Char,
                       ByVal aktBreite As Double,
@@ -667,10 +664,7 @@
                     End If
             End Select
         ElseIf nurStrasse Then
-
-
-            ' Nur Strasse mit Leitplanken – keine Hindernisse, keine Items.
-            ' (Leitplanken sind oben bereits gesetzt)
+            ' Leitplanken reichen – kein Spawn
 
         Else
             Randomize()
@@ -706,7 +700,7 @@
             End If
 
 
-            ' Boost-Feld (2 Zeichen breit) zufaellig auf freie Strasse setzen
+            ' Boost-Feld (2 Zeichen breit) zufällig auf freie Straße setzen
 
             Dim fahrbahnBoost As Integer = leitRechts - leitLinks - 1
             If fahrbahnBoost > 2 Then
@@ -724,10 +718,11 @@
         End If
     End Sub
 
+#End Region
 
-    '  SPIELFELD ZEICHNEN
-    '  Eigene Sub, damit der Bildschirm sowohl in der Hauptschleife
-    '  als auch nach einer Pause neu aufgebaut werden kann.
+#Region "SpielMechanik"
+
+    ' Spielfeld zeichnen (auch nach Pause)
 
     Sub Spielfeld_Rendern(ByVal spielfeld(,) As Char,
                           ByVal curbPhase As Integer,
@@ -800,9 +795,7 @@
     End Sub
 
 
-    '  PAUSE
-    '  Wird im Spiel mit der Taste P aufgerufen. Zeigt ein
-    '  Pause-Fenster und baut danach das Spielfeld wieder auf.
+    ' Pause (Taste P im Spiel)
 
     Sub Pause_Anzeigen(ByVal spielfeld(,) As Char,
                        ByVal curbPhase As Integer,
@@ -814,6 +807,7 @@
         Console.ForegroundColor = ConsoleColor.Yellow
         Zentriert_Schreiben("+-------------------------------+", 9)
         Zentriert_Schreiben("|          P A U S E            |", 10)
+        ' Pause-Fenster
         Zentriert_Schreiben("|                               |", 11)
         Zentriert_Schreiben("| Beliebige Taste = Fortsetzen  |", 12)
         Zentriert_Schreiben("+-------------------------------+", 13)
@@ -835,11 +829,7 @@
     End Sub
 
 
-    '  ULTIMATE
-    '  Fuehrt das Ultimate des jeweiligen Fahrzeugs aus.
-    '  Rueckgabe = Anzahl Ticks Unverwundbarkeit (0 = keine).
-    '  Manche Ultimates wirken zusaetzlich ueber die ByRef-Parameter
-    '  (Position, Zeitlupe, Hindernis-Schonzeit, Spielfeld).
+    ' Ultimate je Fahrzeug (Rückgabe = Unverwundbar-Ticks)
 
     Function Ultimate_Ausfuehren(ByVal fahrzeug As Integer,
                                   ByRef spielfigur_spalte As Integer,
@@ -870,8 +860,8 @@
             Case 4
 
 
-                ' Gold – Goldraeumung: alle Hindernisse auf dem Bildschirm
-                ' loeschen und fuer eine kurze Schonzeit keine neuen spawnen
+                ' Gold – Goldräumung: alle Hindernisse auf dem Bildschirm
+                ' löschen und für eine kurze Schonzeit keine neuen spawnen
 
                 Dim z, s As Integer
                 For z = 0 To ZEILE_MAX
@@ -889,10 +879,7 @@
     End Function
 
 
-    '  SCHUSS
-    '  Feuert von der Mitte des Fahrzeugs nach oben. Zerstoert das
-    '  naechste Hindernis in der Spur des Fahrzeugs. Zeichnet kurz
-    '  einen Strahl und baut danach das Spielfeld wieder auf.
+    ' Schuss nach oben (Pfeil hoch, braucht Munition)
 
     Sub Schuss_Abfeuern(ByVal spielfigur_spalte As Integer,
                         ByVal fahrzeugBreite As Integer,
@@ -905,8 +892,8 @@
         Dim trefferSpalte As Integer = -1
 
 
-        ' Naechstes Hindernis oberhalb des Fahrzeugs suchen
-        ' (von knapp ueber dem Auto nach oben)
+        ' Nächstes Hindernis oberhalb des Fahrzeugs suchen
+        ' (von knapp über dem Auto nach oben)
 
         For z = ZEILE_MAX - 3 To 0 Step -1
             For s = spielfigur_spalte To spielfigur_spalte + fahrzeugBreite - 1
@@ -941,7 +928,7 @@
         Threading.Thread.Sleep(80)
 
 
-        ' Getroffenes Hindernis zerstoeren (Hindernisse sind 2 Zeichen breit)
+        ' Getroffenes Hindernis zerstören (Hindernisse sind 2 Zeichen breit)
 
         If trefferZeile >= 0 Then
             Dim hindLinks As Integer = trefferSpalte
@@ -962,9 +949,11 @@
         Spielfeld_Rendern(spielfeld, curbPhase, strecke)
     End Sub
 
+#End Region
 
-    '  STATISTIK
-    '  Setzt alle gesammelten Werte zurueck (Option im Menue).
+#Region "MetaSpiel"
+
+    ' Statistik (Menue-Option)
 
     Sub Statistik_Zuruecksetzen()
         g_statSpiele = 0
@@ -985,18 +974,18 @@
 
         Zentriert_Schreiben("===  S T A T I S T I K  ===", 2)
 
-
-        ' Durchschnitt pro Spiel berechnen (Division durch 0 vermeiden)
-
         Dim schnitt As Integer = 0
         If g_statSpiele > 0 Then
-            schnitt = g_statGesamtMeter \ g_statSpiele
+            schnitt = g_statGesamtMeter \ g_statSpiele   ' kein Division-by-Zero
         End If
 
         Console.ForegroundColor = ConsoleColor.White
-        Console.SetCursorPosition(20, 5) : Console.WriteLine("Gespielte Runden   : " & g_statSpiele)
-        Console.SetCursorPosition(20, 6) : Console.WriteLine("Gesamtstrecke      : " & g_statGesamtMeter & " m")
-        Console.SetCursorPosition(20, 7) : Console.WriteLine("Beste Strecke      : " & g_statBesteMeter & " m")
+        Console.SetCursorPosition(20, 5)
+        Console.WriteLine("Gespielte Runden   : " & g_statSpiele)
+        Console.SetCursorPosition(20, 6)
+        Console.WriteLine("Gesamtstrecke      : " & g_statGesamtMeter & " m")
+        Console.SetCursorPosition(20, 7)
+        Console.WriteLine("Beste Strecke      : " & g_statBesteMeter & " m")
         Console.SetCursorPosition(20, 8) : Console.WriteLine("Schnitt pro Runde  : " & schnitt & " m")
         Console.SetCursorPosition(20, 9) : Console.WriteLine("Items gesammelt    : " & g_statItems)
         Console.SetCursorPosition(20, 10) : Console.WriteLine("Hindernis-Treffer  : " & g_statHindernisse)
@@ -1010,13 +999,13 @@
         Console.SetCursorPosition(22, 16) : Console.WriteLine("Autobahn   : " & If(g_streckeGefahren(STRECKE_AUTOBAHN), "Ja", "Nein"))
 
         Console.ForegroundColor = ConsoleColor.Gray
-        Console.SetCursorPosition(20, 19) : Console.WriteLine("[ENTER] Zurueck")
-        Console.CursorVisible = True : Console.ReadLine() : Console.CursorVisible = False
+        Zentriert_Schreiben("[ENTER] Zurueck", 19)
+        Console.CursorVisible = True
+        Console.ReadLine()
+        Console.CursorVisible = False
     End Sub
 
-
-    '  ACHIEVEMENTS
-    '  Name und Beschreibung je Erfolg, Pruefung nach jeder Runde.
+    ' Achievements – Name, Beschreibung, Prüfung nach jeder Runde
 
     Function Achievement_Name(ByVal id As Integer) As String
         Select Case id
@@ -1045,9 +1034,10 @@
     End Function
 
 
-    ' Schaltet einen Erfolg frei, wenn die Bedingung erstmals erfuellt ist.
+    ' Schaltet einen Erfolg frei, wenn die Bedingung erstmals erfüllt ist.
 
     Sub Pruefe_Achievement(ByVal id As Integer, ByVal bedingung As Boolean)
+        ' Nur einmal freischalten
         If bedingung And Not g_achFreigeschaltet(id) Then
             g_achFreigeschaltet(id) = True
             If g_neuAchievements <> "" Then g_neuAchievements &= ", "
@@ -1056,7 +1046,7 @@
     End Sub
 
 
-    ' Prueft alle Erfolge. g_neuAchievements enthaelt danach die
+    ' Prüft alle Erfolge. g_neuAchievements enthält danach die
     ' Namen der in dieser Runde neu freigeschalteten Erfolge.
 
     Sub Achievements_Pruefen()
@@ -1080,7 +1070,7 @@
         Zentriert_Schreiben("===  A C H I E V E M E N T S  ===", 1)
 
 
-        ' Anzahl freigeschalteter Erfolge zaehlen
+        ' Anzahl freigeschalteter Erfolge zählen
 
         Dim anzahl As Integer = 0
         For k As Integer = 0 To ACH_ANZAHL - 1
@@ -1107,13 +1097,11 @@
         Next
 
         Console.ForegroundColor = ConsoleColor.Gray
-        Console.SetCursorPosition(8, 4 + (ACH_ANZAHL * 2) + 1)
-        Console.WriteLine("[ENTER] Zurueck")
-        Console.CursorVisible = True : Console.ReadLine() : Console.CursorVisible = False
+        Zentriert_Schreiben("[ENTER] Zurueck", 4 + (ACH_ANZAHL * 2) + 1)
+        Console.CursorVisible = True
+        Console.ReadLine()
+        Console.CursorVisible = False
     End Sub
-
-
-    '  HIGHSCORE
 
     Sub Highscore_Speichern(ByVal name As String, ByVal meter As Integer)
         If meter >= GOLD_UNLOCK_METER Then g_goldFreigeschaltet = True
@@ -1131,6 +1119,8 @@
                 g_highscores(minIdx).meter = meter
             End If
         End If
+
+        ' Tabelle nach Meter sortieren
         For k As Integer = 0 To g_highscoreAnzahl - 2
             For l As Integer = 0 To g_highscoreAnzahl - 2 - k
                 If g_highscores(l).meter < g_highscores(l + 1).meter Then
@@ -1143,11 +1133,11 @@
     End Sub
 
     Sub Highscore_Anzeigen()
-        Musik_Starten("Highscore.wav")
+        Musik_Starten("Highscore.wav")   ' eigene Musik
         Console.BackgroundColor = ConsoleColor.Black
         Console.ForegroundColor = ConsoleColor.Yellow
         Console.Clear()
-        Console.SetCursorPosition(20, 3) : Console.WriteLine("=== HIGHSCORE ===")
+        Zentriert_Schreiben("=== HIGHSCORE ===", 3)
         Console.SetCursorPosition(20, 5) : Console.WriteLine("  #   Name              Meter")
         Console.SetCursorPosition(20, 6) : Console.WriteLine("  -   ----------------  -----")
         If g_highscoreAnzahl = 0 Then
@@ -1160,24 +1150,21 @@
                     g_highscores(k).meter & " m")
             Next
         End If
-        Console.SetCursorPosition(20, 15)
         Console.ForegroundColor = ConsoleColor.Gray
-        Console.WriteLine("  [ENTER] Zurueck")
-        Console.CursorVisible = True : Console.ReadLine() : Console.CursorVisible = False
+        Zentriert_Schreiben("[ENTER] Zurueck", 15)
+        Console.CursorVisible = True
+        Console.ReadLine()
+        Console.CursorVisible = False
         Musik_Stoppen()
     End Sub
 
-
-    '  GAME OVER
+    ' Game Over Screen
 
     Sub Game_Over(ByVal meter As Integer)
         Musik_Stoppen()
         Sound_GameOver()
 
-
-        ' Statistik aktualisieren
-
-        g_statSpiele += 1
+        g_statSpiele += 1   ' Statistik für diese Runde
         g_statGesamtMeter += meter
         If meter > g_statBesteMeter Then g_statBesteMeter = meter
         g_streckeGefahren(g_strecke) = True
@@ -1214,7 +1201,7 @@
         End If
 
 
-        ' Neue Achievements pruefen und ggf. anzeigen
+        ' Neue Achievements prüfen und ggf. anzeigen
 
         Achievements_Pruefen()
         If g_neuAchievements <> "" Then
@@ -1236,11 +1223,16 @@
 
         Console.ForegroundColor = ConsoleColor.Gray
         Zentriert_Schreiben("[ENTER] Zurueck zum Menue", 23)
-        Console.CursorVisible = True : Console.ReadLine() : Console.CursorVisible = False
+        Console.CursorVisible = True
+        Console.ReadLine()
+        Console.CursorVisible = False
     End Sub
 
+#End Region
 
-    '  HAUPTSPIELSCHLEIFE
+#Region "Spielablauf"
+
+    ' Hauptschleife während einer Runde
 
     Sub Spielablauf()
         Dim leben As Integer = g_startLeben
@@ -1296,10 +1288,7 @@
         Dim fahrzeugBreite As Integer = Fahrzeug_Breite(g_fahrzeug)
 
 
-        ' Spielfeld vorbelegen:
-        ' Nur Strasse mit Leitplanken (nurStrasse = True) -> keine
-        ' Hindernisse und keine Items am Start. Die Strecke scrollt
-        ' von oben rein. Startmarkierungen P1/P2/P3 unten.
+        ' Spielfeld: erst nur Straße, P1/P2/P3-Markierungen unten
 
         For z = 0 To ZEILE_MAX
             Dim startNr As Integer = 0
@@ -1314,8 +1303,8 @@
         Next
 
 
-        ' Startlinie quer ueber die Strasse setzen (knapp ueber den
-        ' Startplaetzen). Sie scrollt beim Losfahren nach unten weg.
+        ' Startlinie quer über die Straße setzen (knapp über den
+        ' Startplätzen). Sie scrollt beim Losfahren nach unten weg.
 
         Dim startlinieZeile As Integer = ZEILE_MAX - 8
         For s = leitLinksStart + 1 To leitRechtsStart - 1
@@ -1323,11 +1312,13 @@
         Next
 
         Dim wartezeit As Single
-        Select Case g_ccm
-            Case 50 : wartezeit = CCM_50_WARTEZEIT
-            Case 150 : wartezeit = CCM_150_WARTEZEIT
-            Case Else : wartezeit = CCM_100_WARTEZEIT
-        End Select
+        If g_ccm = 50 Then
+            wartezeit = CCM_50_WARTEZEIT
+        ElseIf g_ccm = 150 Then
+            wartezeit = CCM_150_WARTEZEIT
+        Else
+            wartezeit = CCM_100_WARTEZEIT
+        End If
 
         Do
             segRestlaenge -= 1
@@ -1350,7 +1341,7 @@
             curbPhase += 1
 
 
-            ' Waehrend der Goldraeumungs-Schonzeit keine neuen Hindernisse:
+            ' Während der Goldrämungs-Schonzeit keine neuen Hindernisse:
             ' dazu eine sehr hohe Chance einsetzen (praktisch nie ein Treffer).
             ' Items spawnen weiterhin normal.
 
@@ -1376,7 +1367,7 @@
             If g_itemMeldungTicks = 0 Then g_itemMeldung = ""
 
 
-            ' Alle 100 m: Meilenstein-Linie quer ueber die Strasse in die
+            ' Alle 100 m: Meilenstein-Linie quer über die Strasse in die
             ' oberste Zeile setzen und kurz einen Banner anzeigen.
 
             If meter Mod MEILENSTEIN_INTERVALL = 0 Then
@@ -1443,7 +1434,7 @@
                     ElseIf cki.Key = ConsoleKey.UpArrow Then
 
 
-                        ' Schiessen, falls Munition vorhanden
+                        ' Schießen, falls Munition vorhanden
 
                         If schussMunition > 0 Then
                             Schuss_Abfeuern(spielfigur_spalte, fahrzeugBreite,
@@ -1557,7 +1548,7 @@
                         If kollisionsZelle = BOOST_ZEICHEN Then
 
 
-                            ' Boost-Feld ueberfahren -> fuer 2 Sekunden schneller
+                            ' Boost-Feld überfahren -> für 2 Sekunden schneller
 
                             boostEnde = DateTime.Now.AddSeconds(BOOST_DAUER_SEKUNDEN)
                             g_itemMeldung = "BOOST!"
@@ -1565,7 +1556,7 @@
 
 
                             ' Das ganze Boost-Feld aus dem Spielfeld entfernen.
-                            ' Erst die linke Kante suchen, dann alle ">" loeschen.
+                            ' Erst die linke Kante suchen, dann alle ">" löschen.
 
                             Dim boostLinks As Integer = s
                             Do While boostLinks > 0 AndAlso
@@ -1619,8 +1610,8 @@
                 Strecke_Farben_Setzen(g_strecke)
 
 
-                ' Wartezeit pro Schritt – waehrend der Zeitlupe (Vollbremsung)
-                ' laeuft das Spiel langsamer, waehrend eines Boosts schneller.
+                ' Wartezeit pro Schritt – während der Zeitlupe (Vollbremsung)
+                ' läuft das Spiel langsamer, während eines Boosts schneller.
 
                 Dim aktSleep As Integer = CInt(wartezeit / BEWEGUNG_SPIELFIGUR)
                 If slowmoTicks > 0 Then
@@ -1642,15 +1633,19 @@
         Game_Over(meter)
     End Sub
 
+#End Region
 
-    '  MENUES
+#Region "MenuesUndIntro"
+
+    ' Menüs
 
     Sub Menue_Fahrzeug()
+        ' Musik für dieses Menü
         Musik_Starten("Fahrzeugauswahl.wav")
         Console.BackgroundColor = ConsoleColor.Black
         Console.ForegroundColor = ConsoleColor.Cyan
         Console.Clear()
-        Console.SetCursorPosition(20, 2) : Console.WriteLine("=== FAHRZEUG WAEHLEN ===")
+        Zentriert_Schreiben("=== FAHRZEUG WAEHLEN ===", 2)
         Console.SetCursorPosition(20, 4) : Console.WriteLine("  1. Standard – Ultimate: Vollbremsung")
         Console.ForegroundColor = ConsoleColor.White
         Console.SetCursorPosition(25, 5) : Console.WriteLine(Fahrzeug_Zeile1(1))
@@ -1676,7 +1671,7 @@
             Console.WriteLine("  4. Gold   – ab " & GOLD_UNLOCK_METER & " Metern freischaltbar")
         End If
         Console.ForegroundColor = ConsoleColor.Cyan
-        Console.SetCursorPosition(20, 20) : Console.WriteLine("  Aktuell: " & Fahrzeug_Name(g_fahrzeug))
+        Zentriert_Schreiben("Aktuell: " & Fahrzeug_Name(g_fahrzeug), 20)
         Console.SetCursorPosition(20, 21) : Console.Write("  Eingabe (1-" & If(g_goldFreigeschaltet, "4", "3") & "): ")
         Console.CursorVisible = True
         Dim eingabe As String = Console.ReadLine()
@@ -1693,15 +1688,15 @@
     End Sub
 
     Sub Menue_CCM()
-        Musik_Starten("CCM-Stufe_wählen.wav")
+        Musik_Starten("CCM-Stufe_wählen.wav")   ' Auswahlmusik
         Console.BackgroundColor = ConsoleColor.Black
         Console.ForegroundColor = ConsoleColor.Green
         Console.Clear()
-        Console.SetCursorPosition(20, 2) : Console.WriteLine("=== CCM-STUFE WAEHLEN ===")
+        Zentriert_Schreiben("=== CCM-STUFE WAEHLEN ===", 2)
         Console.SetCursorPosition(20, 4) : Console.WriteLine("   50 CCM  Langsam   (Einsteiger)")
         Console.SetCursorPosition(20, 5) : Console.WriteLine("  100 CCM  Mittel    (Normal)")
         Console.SetCursorPosition(20, 6) : Console.WriteLine("  150 CCM  Schnell   (Profi)")
-        Console.SetCursorPosition(20, 8) : Console.WriteLine("  Aktuell: " & g_ccm & " CCM")
+        Zentriert_Schreiben("Aktuell: " & g_ccm & " CCM", 8)
         Console.SetCursorPosition(20, 9) : Console.Write("  Eingabe (50 / 100 / 150): ")
         Console.CursorVisible = True
         Dim eingabe As String = Console.ReadLine()
@@ -1714,19 +1709,19 @@
     End Sub
 
     Sub Menue_Strecke()
-        Musik_Starten("Streckenauswahl.wav")
+        Musik_Starten("Streckenauswahl.wav")   ' Strecken-Musik
         Console.BackgroundColor = ConsoleColor.Black
         Console.ForegroundColor = ConsoleColor.Magenta
         Console.Clear()
-        Console.SetCursorPosition(20, 2) : Console.WriteLine("=== STRECKE WAEHLEN ===")
+        Zentriert_Schreiben("=== STRECKE WAEHLEN ===", 2)
         Console.SetCursorPosition(20, 4)
         Console.ForegroundColor = ConsoleColor.Cyan : Console.WriteLine("  1. Eisstrecke  Weiss / Cyan")
         Console.SetCursorPosition(20, 5)
         Console.ForegroundColor = ConsoleColor.Yellow : Console.WriteLine("  2. Wueste      Gelb / Schwarz")
         Console.SetCursorPosition(20, 6)
         Console.ForegroundColor = ConsoleColor.White : Console.WriteLine("  3. Autobahn    Grau / Weiss")
-        Console.SetCursorPosition(20, 8)
-        Console.ForegroundColor = ConsoleColor.Magenta : Console.WriteLine("  Aktuell: " & Strecke_Name(g_strecke))
+        Console.ForegroundColor = ConsoleColor.Magenta
+        Zentriert_Schreiben("Aktuell: " & Strecke_Name(g_strecke), 8)
         Console.SetCursorPosition(20, 9) : Console.Write("  Eingabe (1 / 2 / 3): ")
         Console.CursorVisible = True
         Dim eingabe As String = Console.ReadLine()
@@ -1739,9 +1734,7 @@
     End Sub
 
 
-    '  OPTIONEN-MENUE
-    '  Laeuft in einer Schleife, damit mehrere Einstellungen
-    '  nacheinander geaendert werden koennen.
+    ' Optionen (Schleife bis Zurück)
 
     Sub Menue_Optionen()
         Dim fertig As Boolean = False
@@ -1749,7 +1742,7 @@
             Console.BackgroundColor = ConsoleColor.Black
             Console.ForegroundColor = ConsoleColor.White
             Console.Clear()
-            Console.SetCursorPosition(20, 2) : Console.WriteLine("=== OPTIONEN ===")
+            Zentriert_Schreiben("=== OPTIONEN ===", 2)
 
             Console.SetCursorPosition(20, 5)
             Console.WriteLine("  1. Musik          : " & If(g_musikAn, "AN", "AUS"))
@@ -1796,7 +1789,7 @@
                 Case "3"
 
 
-                    ' Statistik zuruecksetzen (mit Sicherheitsabfrage)
+                    ' Statistik zurücksetzen (mit Sicherheitsabfrage)
 
                     Console.SetCursorPosition(20, 13)
                     Console.ForegroundColor = ConsoleColor.Red
@@ -1818,8 +1811,8 @@
         Console.BackgroundColor = ConsoleColor.Black
         Console.ForegroundColor = ConsoleColor.White
         Console.Clear()
-        Console.SetCursorPosition(15, 1) : Console.WriteLine("=== ANLEITUNG ===")
-        Console.SetCursorPosition(5, 3) : Console.WriteLine("Ziel:      Fahre so weit wie moeglich!")
+        Zentriert_Schreiben("=== ANLEITUNG ===", 1)
+        Zentriert_Schreiben("Ziel: Fahre so weit wie moeglich!", 3)
         Console.SetCursorPosition(5, 4) : Console.WriteLine("Steuerung: PFEIL LINKS / RECHTS zum Ausweichen.")
         Console.SetCursorPosition(5, 5) : Console.WriteLine("Schiessen: PFEIL HOCH (mit Munition) zerstoert ein Hindernis.")
         Console.SetCursorPosition(5, 6) : Console.WriteLine("Ultimate:  LEERTASTE wenn [U:bereit] sichtbar.")
@@ -1856,15 +1849,14 @@
         Console.SetCursorPosition(5, 20) : Console.ForegroundColor = ConsoleColor.Green
         Console.WriteLine("  >>  Boost-Feld – " & BOOST_DAUER_SEKUNDEN & " Sek. schneller fahren")
         Console.SetCursorPosition(5, 22)
-        Console.ForegroundColor = ConsoleColor.Gray : Console.WriteLine("  [ENTER] Zurueck")
-        Console.CursorVisible = True : Console.ReadLine() : Console.CursorVisible = False
+        Console.ForegroundColor = ConsoleColor.Gray
+        Zentriert_Schreiben("[ENTER] Zurueck", 22)
+        Console.CursorVisible = True
+        Console.ReadLine()
+        Console.CursorVisible = False
     End Sub
 
-
-    '  INTRO-ANIMATION
-    '  Wird beim Programmstart gezeigt. Karierte Flaggen wandern,
-    '  der Titel pulsiert und ein Kart faehrt ueber den Bildschirm.
-    '  Ein beliebiger Tastendruck fuehrt ins Hauptmenue.
+    ' Intro beim Programmstart
 
     Sub Intro_Animation()
         Console.CursorVisible = False
@@ -1872,12 +1864,9 @@
         Console.Clear()
 
 
-        ' Spielmusik fuer das Intro starten (falls Musik aktiviert)
-
         Musik_Starten("Startbildschirm.wav")
 
-
-        ' Kart (3 Zeilen, 6 Zeichen breit) – Ansicht von oben
+        ' Kart von oben (3 Zeilen)
 
         Dim kart0 As String = " /==\ "
         Dim kart1 As String = "[|oo|]"
@@ -1893,8 +1882,7 @@
 
         Do
 
-            ' Karierte Flaggen oben (Zeile 0) und unten (Zeile ZEILE_MAX),
-            ' das Muster wandert pro Frame -> wirkt wie wehende Flagge.
+            ' Karierte Flaggen oben und unten
 
             Console.SetCursorPosition(0, 0)
             For sc As Integer = 0 To SPALTE_MAX - 1
@@ -1969,6 +1957,8 @@
         Console.BackgroundColor = ConsoleColor.Black
         Console.Clear()
     End Sub
+
+    ' Hauptmenü (Endlosschleife bis Beenden)
 
     Sub Hauptmenue()
         Dim wahl As String
@@ -2052,10 +2042,14 @@
         Musik_Stoppen()
     End Sub
 
+    ' Programmstart
+
     Sub Main()
         Console.CursorVisible = False
         Intro_Animation()
         Hauptmenue()
     End Sub
+
+#End Region
 
 End Module
