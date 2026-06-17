@@ -2,7 +2,7 @@
 
 #Region "KonstantenUndGlobals"
 
-    ' Konstanten: Tastatur
+    ' Konstanten: Tastatur 
 
     Const NO_KEY = 0
     Const CURSOR_LEFT = 1
@@ -69,6 +69,11 @@
     ' Wie viele Schuss eine eingesammelte Schuss-Box gibt
 
     Const SCHUSS_PRO_ITEM = 3
+
+
+    ' Dauer eingesammelter Schilde (in Sekunden)
+
+    Const SCHILD_DAUER_SEKUNDEN = 5
 
 
     ' Hindernisse + Schwierigkeit
@@ -189,6 +194,7 @@
 #End Region
 
 #Region "AudioUndHilfen"
+
 
     ' Tastatur
 
@@ -468,13 +474,14 @@
 
 
     ' Fahrzeug (2x2 ASCII)
+    ' Ki-Entwurf - von uns integriert sowie spezfisch angepasst für das Spiel.
 
     Function Fahrzeug_Zeile1(ByVal id As Integer) As String
         Select Case id
             Case 1 : Return "/##\"
             Case 2 : Return "[BB]"
             Case 3 : Return " /\ "
-            Case 4 : Return "-$$-"
+            Case 4 : Return "=$$="
             Case Else : Return "/##\"
         End Select
     End Function
@@ -484,7 +491,7 @@
             Case 1 : Return "\##/"
             Case 2 : Return "|BB|"
             Case 3 : Return "(oo)"
-            Case 4 : Return "=$=$"
+            Case 4 : Return "=$$="
             Case Else : Return "\##/"
         End Select
     End Function
@@ -571,6 +578,7 @@
 #Region "Streckengenerator"
 
     ' Nächstes Streckensegment würfeln
+    ' Ki-Entwurf - von uns integriert sowie spezfisch angepasst für das Spiel.
 
     Sub Segment_Neu_Wuerfeln(ByRef zielBreite As Double,
                               ByRef zielMitte As Double,
@@ -613,6 +621,7 @@
 
     ' Erzeugt eine Zeile der Strecke
     ' nurStraße=True -> keine Hindernisse/Items (Spielstart)
+    ' Ki-Entwurf - von uns integriert sowie spezfisch angepasst für das Spiel.
 
     Sub Erzeuge_Zeile(ByRef Zeile() As Char,
                       ByVal aktBreite As Double,
@@ -665,6 +674,7 @@
             End Select
         ElseIf nurStrasse Then
             ' Leitplanken reichen – kein Spawn
+            ' Fehlerbehebung durch Ki-Einsatz (Zufällige Generierung der Leitplankenpositionen).
 
         Else
             Randomize()
@@ -701,6 +711,7 @@
 
 
             ' Boost-Feld (2 Zeichen breit) zufällig auf freie Straße setzen
+            ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
 
             Dim fahrbahnBoost As Integer = leitRechts - leitLinks - 1
             If fahrbahnBoost > 2 Then
@@ -723,6 +734,7 @@
 #Region "SpielMechanik"
 
     ' Spielfeld zeichnen (auch nach Pause)
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
 
     Sub Spielfeld_Rendern(ByVal spielfeld(,) As Char,
                           ByVal curbPhase As Integer,
@@ -755,6 +767,7 @@
 
 
                         ' Schwarz-weiss kariert (je nach Spalte abwechselnd)
+                        ' Fehlerbehebung durch Ki-Einsatz (richtige Reihenfolge der Farbanordnung)
 
                         If s Mod 2 = 0 Then
                             Console.BackgroundColor = ConsoleColor.White
@@ -796,6 +809,7 @@
 
 
     ' Pause (Taste P im Spiel)
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
 
     Sub Pause_Anzeigen(ByVal spielfeld(,) As Char,
                        ByVal curbPhase As Integer,
@@ -821,6 +835,7 @@
 
 
         ' Spielmusik wieder starten und Spielfeld neu aufbauen
+        ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
 
         Musik_Starten("Spielsound.wav")
         Strecke_Farben_Setzen(strecke)
@@ -830,7 +845,7 @@
 
 
     ' Ultimate je Fahrzeug (Rückgabe = Unverwundbar-Ticks)
-
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
     Function Ultimate_Ausfuehren(ByVal fahrzeug As Integer,
                                   ByRef spielfigur_spalte As Integer,
                                   ByRef slowmoTicks As Integer,
@@ -880,6 +895,7 @@
 
 
     ' Schuss nach oben (Pfeil hoch, braucht Munition)
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
 
     Sub Schuss_Abfeuern(ByVal spielfigur_spalte As Integer,
                         ByVal fahrzeugBreite As Integer,
@@ -1035,6 +1051,7 @@
 
 
     ' Schaltet einen Erfolg frei, wenn die Bedingung erstmals erfüllt ist.
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
 
     Sub Pruefe_Achievement(ByVal id As Integer, ByVal bedingung As Boolean)
         ' Nur einmal freischalten
@@ -1046,9 +1063,8 @@
     End Sub
 
 
-    ' Prüft alle Erfolge. g_neuAchievements enthält danach die
-    ' Namen der in dieser Runde neu freigeschalteten Erfolge.
-
+    ' Prüft alle Erfolge. g_neuAchievements enthält danach die Namen der in dieser Runde neu freigeschalteten Erfolge.
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
     Sub Achievements_Pruefen()
         g_neuAchievements = ""
         Pruefe_Achievement(0, g_statSpiele >= 1)
@@ -1159,6 +1175,7 @@
     End Sub
 
     ' Game Over Screen
+    ' Fehlerbehebung durch Ki-Einsatz (Anzeige des Game Over Screens nach jeder Runde, damit Spieler sofortiges Feedback erhält).
 
     Sub Game_Over(ByVal meter As Integer)
         Musik_Stoppen()
@@ -1233,6 +1250,7 @@
 #Region "Spielablauf"
 
     ' Hauptschleife während einer Runde
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
 
     Sub Spielablauf()
         Dim leben As Integer = g_startLeben
@@ -1250,7 +1268,7 @@
         Dim segLaenge As Integer = SEG_LAENGE_MAX
 
         Dim schildAktiv As Boolean = False
-        Dim schildTicks As Integer = 0
+        Dim schildEnde As DateTime = DateTime.MinValue
         Dim ultimateAktiv As Boolean = False
         Dim ultimateTicks As Integer = 0
         Dim ultimateVerfuegbar As Boolean = False
@@ -1289,6 +1307,7 @@
 
 
         ' Spielfeld: erst nur Straße, P1/P2/P3-Markierungen unten
+
 
         For z = 0 To ZEILE_MAX
             Dim startNr As Integer = 0
@@ -1370,7 +1389,7 @@
             ' Alle 100 m: Meilenstein-Linie quer über die Strasse in die
             ' oberste Zeile setzen und kurz einen Banner anzeigen.
 
-            If meter Mod MEILENSTEIN_INTERVALL = 0 Then
+            If (meter + KOLLISIONS_ZEILE) Mod MEILENSTEIN_INTERVALL = 0 Then
                 Dim mlLinks As Integer = -1
                 Dim mlRechts As Integer = -1
                 For s = 0 To SPALTE_MAX
@@ -1384,7 +1403,7 @@
                         spielfeld(0, s) = MEILENSTEIN_ZEICHEN
                     Next
                 End If
-                meilensteinText = meter & " m"
+                meilensteinText = (meter + KOLLISIONS_ZEILE) & " m"
                 meilensteinTicks = 12
             End If
 
@@ -1394,7 +1413,7 @@
             Spielfeld_Rendern(spielfeld, curbPhase, g_strecke)
 
 
-            ' Meilenstein-Banner ueber dem Spielfeld anzeigen
+            ' Meilenstein-Banner über dem Spielfeld anzeigen
 
             If meilensteinTicks > 0 Then
                 Console.BackgroundColor = ConsoleColor.Black
@@ -1408,6 +1427,7 @@
 
             For i = 1 To BEWEGUNG_SPIELFIGUR
                 taste = NO_KEY
+                Fahrzeug_Loeschen(spielfigur_spalte, g_fahrzeug) ' Alte Position löschen (Doppelsprung)
                 If Console.KeyAvailable Then
                     Dim cki As ConsoleKeyInfo = Console.ReadKey(True)
                     If cki.Key = ConsoleKey.LeftArrow Then
@@ -1435,7 +1455,7 @@
 
 
                         ' Schießen, falls Munition vorhanden
-
+                        ' Fehlerbehebung durch Ki-Einsatz (Munitionsverbrauch wird korrekt angezeigt)
                         If schussMunition > 0 Then
                             Schuss_Abfeuern(spielfigur_spalte, fahrzeugBreite,
                                             curbPhase, g_strecke, spielfeld)
@@ -1458,7 +1478,7 @@
                     End If
                 Next
 
-                Fahrzeug_Loeschen(spielfigur_spalte, g_fahrzeug)
+
 
                 If taste = CURSOR_LEFT Then spielfigur_spalte -= 1
                 If taste = CURSOR_RIGHT Then spielfigur_spalte += 1
@@ -1508,7 +1528,7 @@
                                     g_itemMeldungTicks = 15
                                 Case ITEM_TYP_SCHILD
                                     schildAktiv = True
-                                    schildTicks = 15
+                                    schildEnde = DateTime.Now.AddSeconds(SCHILD_DAUER_SEKUNDEN)
                                     g_itemMeldung = "+SCHILD"
                                     g_itemMeldungTicks = 15
                                 Case ITEM_TYP_ULTIMATE
@@ -1572,10 +1592,8 @@
                     End If
                 Next
 
-                If schildAktiv Then
-                    schildTicks -= 1
-                    If schildTicks <= 0 Then schildAktiv = False
-                End If
+                ' Schild ist für eingestellte Dauer aktiv
+                schildAktiv = (DateTime.Now < schildEnde)
                 If ultimateAktiv Then
                     ultimateTicks -= 1
                     If ultimateTicks <= 0 Then ultimateAktiv = False
@@ -1610,8 +1628,7 @@
                 Strecke_Farben_Setzen(g_strecke)
 
 
-                ' Wartezeit pro Schritt – während der Zeitlupe (Vollbremsung)
-                ' läuft das Spiel langsamer, während eines Boosts schneller.
+                ' Wartezeit pro Schritt – während der Zeitlupe (Vollbremsung) läuft das Spiel langsamer, während eines Boosts schneller.
 
                 Dim aktSleep As Integer = CInt(wartezeit / BEWEGUNG_SPIELFIGUR)
                 If slowmoTicks > 0 Then
@@ -1638,7 +1655,7 @@
 #Region "MenuesUndIntro"
 
     ' Menüs
-
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
     Sub Menue_Fahrzeug()
         ' Musik für dieses Menü
         Musik_Starten("Fahrzeugauswahl.wav")
@@ -1735,7 +1752,7 @@
 
 
     ' Optionen (Schleife bis Zurück)
-
+    ' Fehlerbehebng durch Ki-Einsatz (Anpassung der Musikstruktur sowie der Spielmechanik).
     Sub Menue_Optionen()
         Dim fertig As Boolean = False
         Do
@@ -1770,7 +1787,7 @@
                     If g_musikAn Then
 
 
-                        ' Wieder eingeschaltet -> Menuemusik sofort starten
+                        ' Wieder eingeschaltet -> Menümusik sofort starten
 
                         Musik_Starten("Startbildschirm.wav")
                     Else
@@ -1857,7 +1874,7 @@
     End Sub
 
     ' Intro beim Programmstart
-
+    ' Ki-Entwurf - von uns integriert sowie spezifisch angepasst für das Spiel.
     Sub Intro_Animation()
         Console.CursorVisible = False
         Console.BackgroundColor = ConsoleColor.Black
@@ -1910,7 +1927,7 @@
             Zentriert_Schreiben("M A R I O   K A R T", 7)
 
 
-            ' Kart an alter Position loeschen
+            ' Kart an alter Position löschen
 
             Dim leer As String = New String(" "c, kartBreite)
             Console.SetCursorPosition(prevSpalte, kartZeile) : Console.Write(leer)
@@ -1959,7 +1976,7 @@
     End Sub
 
     ' Hauptmenü (Endlosschleife bis Beenden)
-
+    ' Fehlerbehebung durch Ki-Einsatz (Design- und Logik-Optimierung, um reibungslose Navigation zu gewährleisten).
     Sub Hauptmenue()
         Dim wahl As String
         Musik_Starten("Startbildschirm.wav")
