@@ -971,8 +971,8 @@
 
 #Region "MetaSpiel"
 
-    ' Statistik (Menue-Option)
-
+    ' Statistik (Menü-Option)
+    ' Fehlerbehebung durch Ki-Einsatz (Strukturierung der Menü-Option)
     Sub Statistik_Zuruecksetzen()
         g_statSpiele = 0
         g_statGesamtMeter = 0
