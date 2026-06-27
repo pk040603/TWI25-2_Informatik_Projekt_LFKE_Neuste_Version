@@ -961,7 +961,7 @@
         End If
 
 
-        ' Spielfeld neu aufbauen, damit der Strahl wieder verschwindet
+        ' Spielfeld neu aufbauen damit der Strahl wieder verschwindet
 
         Strecke_Farben_Setzen(strecke)
         Spielfeld_Rendern(spielfeld, curbPhase, strecke)
@@ -1089,7 +1089,7 @@
 
 
         ' Anzahl freigeschalteter Erfolge zählen
-
+        ' Fehlerbehebung durch Ki-Einsatz (Zählung in einer Schleife)
         Dim anzahl As Integer = 0
         For k As Integer = 0 To ACH_ANZAHL - 1
             If g_achFreigeschaltet(k) Then anzahl += 1
