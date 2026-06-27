@@ -264,6 +264,7 @@
 
 
     ' Startaufstellung + Ampel vor dem Rennen
+    ' Ki-Entwurf - von uns integriert sowie spezfisch angepasst für das Spiel.
 
     Function Startaufstellung_Anzeigen() As Integer
         Randomize()
@@ -428,6 +429,7 @@
     End Sub
 
     ' Leitplanken: wechselnd weiss/rot
+    ' Ki-Entwurf - von uns integriert sowie spezfisch angepasst für das Spiel.
 
     Sub Curb_Farbe_Setzen(ByVal curbPhase As Integer)
         If curbPhase Mod 2 = 0 Then
